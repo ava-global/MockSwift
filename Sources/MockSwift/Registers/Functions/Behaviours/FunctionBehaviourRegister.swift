@@ -28,7 +28,8 @@ import Foundation
 class FunctionBehaviourRegister: BehaviourRegister {
     private var functionBehaviours: [FunctionIdentifier: [BehaviourTrigger]]
     private var unusedBehaviours: [UUID]
-
+    private let lock = NSLock()
+    
     var unusedFunctionBehaviours: [FunctionIdentifier: [BehaviourTrigger]] {
         functionBehaviours.filter { element in
             element.value.contains { value in
@@ -56,6 +57,8 @@ class FunctionBehaviourRegister: BehaviourRegister {
     }
 
     func makeBehaviourUsed(for identifier: UUID) {
+        lock.lock()
         unusedBehaviours.removeAll { $0 == identifier }
+        lock.unlock()
     }
 }
