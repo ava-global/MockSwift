@@ -29,7 +29,8 @@ class FunctionCallRegister: CallRegister {
     private let clock: Clock
     private(set) var calls: [FunctionIdentifier: [FunctionCall]]
     private(set) var unverifiedCalls: [UUID]
-
+    private let lock = NSLock()
+    
     var allCallHaveBeenVerified: Bool {
         unverifiedCalls.isEmpty
     }
@@ -41,8 +42,10 @@ class FunctionCallRegister: CallRegister {
     }
 
     func recordCall(_ call: FunctionCall, for identifier: FunctionIdentifier) {
+        lock.lock()
         calls[identifier, default: []].append(call)
         unverifiedCalls.append(call.identifier)
+        lock.unlock()
     }
 
     func recordedCalls(for identifier: FunctionIdentifier, when matchs: [AnyPredicate]) -> [FunctionCall] {
@@ -52,6 +55,8 @@ class FunctionCallRegister: CallRegister {
     }
 
     func makeCallVerified(for identifier: UUID) {
+        lock.lock()
         unverifiedCalls.removeAll { $0 == identifier }
+        lock.unlock()
     }
 }

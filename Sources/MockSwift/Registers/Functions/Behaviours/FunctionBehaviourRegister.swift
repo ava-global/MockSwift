@@ -52,8 +52,10 @@ class FunctionBehaviourRegister: BehaviourRegister {
 
     func record(_ trigger: BehaviourTrigger,
                 for identifier: FunctionIdentifier) {
+        lock.lock()
         functionBehaviours[identifier, default: []].append(trigger)
         unusedBehaviours.append(trigger.behaviour.identifier)
+        lock.unlock()
     }
 
     func makeBehaviourUsed(for identifier: UUID) {
